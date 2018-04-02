@@ -1,0 +1,11 @@
+FROM sandbox-<%= service %>
+
+RUN apt-get update && apt-get install -y sudo
+ARG user=root
+ARG uid=0
+RUN if [ ${uid} != 0 ]; then \
+    useradd -m ${user} -u ${uid} && \
+    echo "${user}:${user}" | chpasswd && \
+    usermod -G sudo ${user} && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers; \
+  fi

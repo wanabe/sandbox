@@ -1,0 +1,45 @@
+#!/bin/sh
+
+DIR=`dirname $0`
+BASE=`basename $0`
+while :; do
+  cd "$DIR"
+  [ -L "$DIR/$BASE" ] || break
+  DIR=`dirname "$(readlink $DIR/$BASE)"`
+done
+
+for OPT in "$@"; do
+  case "$OPT" in
+    --install )
+      [ -L ~/.local/bin/sandbox ] || ln -s `pwd`/sandbox ~/.local/bin/sandbox
+      exit
+      ;;
+    -l )
+      cd boxes/
+      find * -type d
+      exit
+      ;;
+    -v )
+      [ -n "$VOLUMES" ] && VOLUMES="$VOLUMES "
+      VOLUMES="${VOLUMES}$2"
+      shift 2
+      ;;
+  esac
+done
+
+for s in "$@"; do
+  erb service="$s" -T- boxes/Dockerfile.erb > boxes/$s/Dockerfile-user
+done
+
+SERVICE=`echo $1|tr \/ _`
+export uid
+export USER
+export HOME
+[ -z "$uid" ] && uid=$(id -u)
+
+clean=1
+erb box="$1" stage=build volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - build || fail
+erb box="$1" stage=up    volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - up -d run-"$SERVICE" 2>&1| grep "up-to-date$" && clean=0
+docker exec -it sandbox_run-"$SERVICE"_1 bash -l
+[ $clean = 1 ] || exit
+erb box="$1" stage=down  volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - down
