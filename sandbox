@@ -1,5 +1,8 @@
 #!/bin/sh
 
+if [ -z "$SANDBOX_PROFILE" ]; then
+  SANDBOX_PROFILE=~/.sandbox/profile
+fi
 if [ -z "$SANDBOXES_DIR" ]; then
   SANDBOXES_DIR=./boxes
 fi
@@ -14,6 +17,8 @@ while :; do
   [ -L "$DIR/$BASE" ] || break
   DIR=`dirname "$(readlink $DIR/$BASE)"`
 done
+
+[ -f "$SANDBOX_PROFILE" ] && . "$SANDBOX_PROFILE"
 
 for OPT in "$@"; do
   case "$OPT" in
