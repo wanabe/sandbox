@@ -39,17 +39,17 @@ WORKDIR="./volumes/work/${BOX}"
 mkdir -p "$WORKDIR"
 if [ -f "boxes/$BOX/Dockerfile" ]; then
   erb box="$BOX" -T- boxes/Dockerfile.erb > "boxes/$BOX/Dockerfile-user"
-  erb box="$BOX" stage=build volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - build || fail
-  erb box="$BOX" stage=up    volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - up -d run-"$SERVICE" 2>&1| grep "up-to-date$" && clean=0
+  erb box="$BOX" stage=build volumes="$VOLUMES" -T- boxes/docker-compose.yml.erb | docker-compose -f - build || fail
+  erb box="$BOX" stage=up    volumes="$VOLUMES" -T- boxes/docker-compose.yml.erb | docker-compose -f - up -d run-"$SERVICE" 2>&1| grep "up-to-date$" && clean=0
   docker exec -it sandbox_run-"$SERVICE"_1 bash -l
   [ $clean = 1 ] || exit
-  erb box="$BOX" stage=down  volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - down
+  erb box="$BOX" stage=down  volumes="$VOLUMES" -T- boxes/docker-compose.yml.erb | docker-compose -f - down
   exit
 fi
 
 if [ -f "boxes/$BOX/vagrant_config.rb" ]; then
   export VAGRANT_CWD="$WORKDIR"
-  erb box="$BOX" volumes=$VOLUMES -T- boxes/Vagrantfile.erb > "$VAGRANT_CWD/Vagrantfile"
+  erb box="$BOX" volumes="$VOLUMES" -T- boxes/Vagrantfile.erb > "$VAGRANT_CWD/Vagrantfile"
   vagrant up
   vagrant ssh
   vagrant halt
