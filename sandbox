@@ -34,7 +34,9 @@ export USER
 export HOME
 [ -z "$uid" ] && uid=$(id -u)
 clean=1
+WORKDIR="./volumes/work/${BOX}"
 
+mkdir -p "$WORKDIR"
 if [ -f "boxes/$BOX/Dockerfile" ]; then
   erb box="$BOX" -T- boxes/Dockerfile.erb > "boxes/$BOX/Dockerfile-user"
   erb box="$BOX" stage=build volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - build || fail
@@ -46,7 +48,7 @@ if [ -f "boxes/$BOX/Dockerfile" ]; then
 fi
 
 if [ -f "boxes/$BOX/vagrant_config.rb" ]; then
-  export VAGRANT_CWD="./volumes/shared/work/${BOX}"
+  export VAGRANT_CWD="$WORKDIR"
   erb box="$BOX" volumes=$VOLUMES -T- boxes/Vagrantfile.erb > "$VAGRANT_CWD/Vagrantfile"
   vagrant up
   vagrant ssh

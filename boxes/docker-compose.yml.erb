@@ -40,7 +40,7 @@ services:
     stdin_open: true
     working_dir: /work/<%= box %>
     volumes:
-    - ./volumes/shared/work:/work
+    - ./volumes/work:/work
     <%- volumes.split(" ").each do |volume| -%>
     - "<%= volume %>"
     <%- end -%>
