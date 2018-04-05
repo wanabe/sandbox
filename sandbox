@@ -49,9 +49,10 @@ fi
 
 if [ -f "boxes/$BOX/vagrant_config.rb" ]; then
   export VAGRANT_CWD="$WORKDIR"
-  erb box="$BOX" volumes="$VOLUMES" -T- boxes/Vagrantfile.erb > "$VAGRANT_CWD/Vagrantfile"
-  vagrant up
+  [ "$(vagrant status|sed -ne '3s/^[^ ]* *\([^ ]*\).*/\1/p')" = running ] && clean=0
+  [ $clean = 1 ] && erb box="$BOX" volumes="$VOLUMES" -T- boxes/Vagrantfile.erb > "$VAGRANT_CWD/Vagrantfile"
+  [ $clean = 1 ] && vagrant up
   vagrant ssh
-  vagrant halt
+  [ $clean = 1 ] && vagrant halt
   exit
 fi
