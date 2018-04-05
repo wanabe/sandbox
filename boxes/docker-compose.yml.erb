@@ -38,9 +38,9 @@ services:
         user: ${USER}
     tty: true
     stdin_open: true
-    working_dir: /work/<%= box %>
+    working_dir: /work
     volumes:
-    - ./volumes/work:/work
+    - <%= workdir %>:/work
     <%- volumes.split(" ").each do |volume| -%>
     - "<%= volume %>"
     <%- end -%>

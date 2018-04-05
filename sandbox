@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if [ -z "$SANDBOXES_DIR" ]; then
+  SANDBOXES_DIR=./boxes
+fi
+if [ -z "$SANDBOX_VOLUME_DIR" ]; then
+  SANDBOX_VOLUMES_DIR=./volumes
+fi
+
 DIR=`dirname $0`
 BASE=`basename $0`
 while :; do
@@ -15,7 +22,7 @@ for OPT in "$@"; do
       exit
       ;;
     -l )
-      cd boxes/
+      cd "$SANDBOXES_DIR"
       find * -type d
       exit
       ;;
@@ -34,23 +41,23 @@ export USER
 export HOME
 [ -z "$uid" ] && uid=$(id -u)
 clean=1
-WORKDIR="./volumes/work/${BOX}"
+WORKDIR="$SANDBOX_VOLUMES_DIR/${BOX}"
 
 mkdir -p "$WORKDIR"
-if [ -f "boxes/$BOX/Dockerfile" ]; then
-  erb box="$BOX" -T- boxes/Dockerfile.erb > "boxes/$BOX/Dockerfile-user"
-  erb box="$BOX" stage=build volumes="$VOLUMES" -T- boxes/docker-compose.yml.erb | docker-compose -f - build || fail
-  erb box="$BOX" stage=up    volumes="$VOLUMES" -T- boxes/docker-compose.yml.erb | docker-compose -f - up -d run-"$SERVICE" 2>&1| grep "up-to-date$" && clean=0
+if [ -f "$SANDBOXES_DIR/$BOX/Dockerfile" ]; then
+  erb box="$BOX" -T- "$SANDBOXES_DIR/Dockerfile.erb" > "boxes/$BOX/Dockerfile-user"
+  erb box="$BOX" stage=build workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker-compose.yml.erb" | docker-compose -f - build || fail
+  erb box="$BOX" stage=up    workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker-compose.yml.erb" | docker-compose -f - up -d run-"$SERVICE" 2>&1| grep "up-to-date$" && clean=0
   docker exec -it sandbox_run-"$SERVICE"_1 bash -l
   [ $clean = 1 ] || exit
-  erb box="$BOX" stage=down  volumes="$VOLUMES" -T- boxes/docker-compose.yml.erb | docker-compose -f - down
+  erb box="$BOX" stage=down  workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker-compose.yml.erb" | docker-compose -f - down
   exit
 fi
 
-if [ -f "boxes/$BOX/vagrant_config.rb" ]; then
+if [ -f "$SANDBOXES_DIR/$BOX/vagrant_config.rb" ]; then
   export VAGRANT_CWD="$WORKDIR"
   [ "$(vagrant status|sed -ne '3s/^[^ ]* *\([^ ]*\).*/\1/p')" = running ] && clean=0
-  [ $clean = 1 ] && erb box="$BOX" volumes="$VOLUMES" -T- boxes/Vagrantfile.erb > "$VAGRANT_CWD/Vagrantfile"
+  [ $clean = 1 ] && erb box="$BOX" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/Vagrantfile.erb" > "$VAGRANT_CWD/Vagrantfile"
   [ $clean = 1 ] && vagrant up
   vagrant ssh
   [ $clean = 1 ] && vagrant halt
