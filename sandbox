@@ -27,19 +27,29 @@ for OPT in "$@"; do
   esac
 done
 
-for s in "$@"; do
-  erb service="$s" -T- boxes/Dockerfile.erb > boxes/$s/Dockerfile-user
-done
-
-SERVICE=`echo $1|tr \/ _`
+BOX="$1"
+SERVICE=`echo $BOX|tr \/ _`
 export uid
 export USER
 export HOME
 [ -z "$uid" ] && uid=$(id -u)
-
 clean=1
-erb box="$1" stage=build volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - build || fail
-erb box="$1" stage=up    volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - up -d run-"$SERVICE" 2>&1| grep "up-to-date$" && clean=0
-docker exec -it sandbox_run-"$SERVICE"_1 bash -l
-[ $clean = 1 ] || exit
-erb box="$1" stage=down  volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - down
+
+if [ -f "boxes/$BOX/Dockerfile" ]; then
+  erb box="$BOX" -T- boxes/Dockerfile.erb > "boxes/$BOX/Dockerfile-user"
+  erb box="$BOX" stage=build volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - build || fail
+  erb box="$BOX" stage=up    volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - up -d run-"$SERVICE" 2>&1| grep "up-to-date$" && clean=0
+  docker exec -it sandbox_run-"$SERVICE"_1 bash -l
+  [ $clean = 1 ] || exit
+  erb box="$BOX" stage=down  volumes=$VOLUMES -T- boxes/docker-compose.yml.erb | docker-compose -f - down
+  exit
+fi
+
+if [ -f "boxes/$BOX/vagrant_config.rb" ]; then
+  export VAGRANT_CWD="./volumes/shared/work/${BOX}"
+  erb box="$BOX" volumes=$VOLUMES -T- boxes/Vagrantfile.erb > "$VAGRANT_CWD/Vagrantfile"
+  vagrant up
+  vagrant ssh
+  vagrant halt
+  exit
+fi

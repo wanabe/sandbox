@@ -1,0 +1,9 @@
+Vagrant.configure("2") do |config|
+  <%-%><%= File.read("#{File.dirname(__FILE__)}/#{box}/vagrant_config.rb").gsub(/^/, "  ").chomp %>
+  <%-
+    (volumes || "").split(" ").each do |volume|
+    src, dst = volume.split(":")
+  -%>
+  config.vm.synced_folder "<%= src %>", "<%= dst %>"
+  <%- end -%>
+end
