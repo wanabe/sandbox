@@ -1,5 +1,3 @@
-FROM sandbox-alpine
-
 RUN apk add --no-cache \
   autoconf bison ca-certificates coreutils dpkg-dev dpkg \
   gcc gdbm-dev glib-dev libc-dev libffi-dev libressl libressl-dev \

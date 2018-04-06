@@ -1,41 +1,13 @@
 version: '3'
 services:
-  <%-
-    name = s = nil
-    box.split("/").each do |part|
-      if name
-        depend = name
-        name = "#{name}_#{part}"
-        s = "#{s}/#{part}"
-      else
-        name = s = part
-      end
-      next if stage != "build"
-  -%>
-  <%= name %>:
-    image: sandbox-<%= s %>
+  <%= box.tr("/", "_") %>:
+    image: sandbox-<%= box %>
+    user: <%= ENV["USER"] %>
     build:
-      context: boxes/<%= s %>
-    <%- if depend %>
-    depends_on:
-    - <%= depend %>
-    <%- end %>
-  <%-
-    end
-   -%>
-  run-<%= name %>:
-    image: sandbox-run-<%= box %>
-    user: ${USER}
-  <%- if stage == "build" %>
-    depends_on:
-    - <%= name %>
-  <%- end %>
-    build:
-      context: boxes/<%= box %>
-      dockerfile: Dockerfile-user
+      context: .
       args:
-        uid: ${uid}
-        user: ${USER}
+        uid: <%= ENV["uid"] %>
+        user: <%= ENV["USER"] %>
     tty: true
     stdin_open: true
     working_dir: /work

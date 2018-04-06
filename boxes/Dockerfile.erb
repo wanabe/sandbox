@@ -1,4 +1,6 @@
-FROM sandbox-<%= box %>
+<%- box.scan(/\/|$/) do -%>
+  <%- %><%= File.read("#{boxes_dir}/#$`/Dockerfile") -%>
+<%- end -%>
 
 RUN if which apt-get; then apt-get update && apt-get install -y sudo; \
   elif which apk; then apk add --no-cache sudo shadow; \

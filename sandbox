@@ -58,12 +58,16 @@ WORKDIR="$SANDBOX_VOLUMES_DIR/${BOX}"
 
 mkdir -p "$WORKDIR"
 if [ -f "$SANDBOXES_DIR/$BOX/Dockerfile" ]; then
-  erb box="$BOX" -T- "$SANDBOXES_DIR/Dockerfile.erb" > "boxes/$BOX/Dockerfile-user"
-  erb box="$BOX" stage=build workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker-compose.yml.erb" | docker-compose -f - build || fail
-  erb box="$BOX" stage=up    workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker-compose.yml.erb" | docker-compose -f - up -d run-"$SERVICE" 2>&1| grep "up-to-date$" && clean=0
-  docker exec -it sandbox_run-"$SERVICE"_1 bash -l
+  DOCKER_DIR="$WORKDIR/.docker/$USER"
+  mkdir -p "$DOCKER_DIR"
+  erb box="$BOX" boxes_dir="$SANDBOXES_DIR" -T- "$SANDBOXES_DIR/Dockerfile.erb" > "$DOCKER_DIR/Dockerfile"
+  erb box="$BOX" workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker-compose.yml.erb" > "$DOCKER_DIR/docker-compose.yml"
+  cd "$DOCKER_DIR"
+  docker-compose build || fail
+  docker-compose up -d 2>&1| grep "up-to-date$" && clean=0
+  docker-compose exec "$SERVICE" bash -l
   [ $clean = 1 ] || exit
-  erb box="$BOX" stage=down  workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker-compose.yml.erb" | docker-compose -f - down
+  docker-compose down
   exit
 fi
 
