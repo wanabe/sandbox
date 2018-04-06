@@ -1,11 +1,14 @@
 FROM sandbox-<%= box %>
 
-RUN apt-get update && apt-get install -y sudo
+RUN if which apt-get; then apt-get update && apt-get install -y sudo; \
+  elif which apk; then apk add --no-cache sudo shadow; \
+  fi
 ARG user=root
 ARG uid=0
 RUN if [ ${uid} != 0 ]; then \
-    useradd -m ${user} -u ${uid} && \
+    (useradd -m ${user} -u ${uid} || adduser -D -u ${uid} ${user}) && \
     echo "${user}:${user}" | chpasswd && \
-    usermod -G sudo ${user} && \
+    (usermod -G sudo ${user} || usermod -G wheel ${user} ) && \
     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers; \
+    echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers; \
   fi
