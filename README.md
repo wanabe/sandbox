@@ -1,6 +1,6 @@
 # sandbox
 
-This software provides sandbox environments with docker-compose.
+This software provides sandbox environments with docker-compose / vagrant.
 
 ## install
 
@@ -36,16 +36,47 @@ Above means it runs ppc64le/ruby with shared directory "~/work/prog/ruby/ruby" a
 
 ## current list of sandboxes
 
+* aarch64
+  * aarch64/ruby
+* alpine
+  * alpine/ruby
 * mingw-w64-x86-64
   * mingw-w64-x86-64/ruby
 * openbsd6
+* openindiana
 * ppc64le
   * ppc64le/ruby
+* ubuntu
+  * ubuntu/ruby
 
-You can also get the list with `-l` option.
+You can also get the list with `-l` or `-L` option.
 
 ```
-$ envset -l
+$ sandbox -l
+aarch64
+aarch64/ruby
+alpine
+alpine/ruby
 mingw-w64-x86-64
+mingw-w64-x86-64/ruby
+openbsd6
+openindiana
 ppc64le
+ppc64le/ruby
+ubuntu
+ubuntu/ruby
+
+$ sandbox -L
+* aarch64
+  * aarch64/ruby
+* alpine
+  * alpine/ruby
+* mingw-w64-x86-64
+  * mingw-w64-x86-64/ruby
+* openbsd6
+* openindiana
+* ppc64le
+  * ppc64le/ruby
+* ubuntu
+  * ubuntu/ruby
 ```
