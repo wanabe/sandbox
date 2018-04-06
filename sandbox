@@ -1,13 +1,16 @@
 #!/bin/sh
 
+if [ -z "$SANDBOX_ROOT" ]; then
+  SANDBOX_ROOT=~/.sandbox
+fi
 if [ -z "$SANDBOX_PROFILE" ]; then
-  SANDBOX_PROFILE=~/.sandbox/profile
+  SANDBOX_PROFILE="$SANDBOX_ROOT/profile"
 fi
 if [ -z "$SANDBOXES_DIR" ]; then
   SANDBOXES_DIR=./boxes
 fi
 if [ -z "$SANDBOX_VOLUME_DIR" ]; then
-  SANDBOX_VOLUMES_DIR=./volumes
+  SANDBOX_VOLUMES_DIR="$SANDBOX_ROOT/volumes"
 fi
 
 DIR=`dirname $0`
