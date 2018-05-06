@@ -29,6 +29,7 @@ done
 for OPT in "$@"; do
   case "$OPT" in
     --install )
+      [ -d ~/.local/bin ] || mkdir ~/.local/bin
       [ -L ~/.local/bin/sandbox ] || ln -s `pwd`/sandbox ~/.local/bin/sandbox
       exit
       ;;
