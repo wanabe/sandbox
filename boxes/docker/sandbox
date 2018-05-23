@@ -1,0 +1,11 @@
+DOCKER_DIR="$WORKDIR/.docker/$USER"
+mkdir -p "$DOCKER_DIR"
+erb box="$BOX" boxes_dir="$SANDBOXES_DIR" -T- "$SANDBOXES_DIR/docker/Dockerfile.erb" > "$DOCKER_DIR/Dockerfile"
+erb box="$BOX" workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker/docker-compose.yml.erb" > "$DOCKER_DIR/docker-compose.yml"
+cd "$DOCKER_DIR"
+docker-compose build || fail
+docker-compose up -d 2>&1| grep "up-to-date$" && clean=0
+docker-compose exec "$SERVICE" bash -l
+[ $clean = 1 ] || exit
+docker-compose down
+exit
