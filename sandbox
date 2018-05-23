@@ -42,6 +42,10 @@ for OPT in "$@"; do
       find * -type d|ruby -pe '$_ = "#{"  " * $_.count("/")}* #$_"'
       exit
       ;;
+    -H )
+      SANDBOX_HOME_DIR="$1"
+      shift 2
+      ;;
     -v )
       [ -n "$VOLUMES" ] && VOLUMES="$VOLUMES "
       VOLUMES="${VOLUMES}$2"
