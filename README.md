@@ -48,7 +48,5 @@ Above means it runs docker/ppc64le/ruby with shared directory "~/work/prog/ruby/
   * docker/mingw-w64-x86-64
     * docker/mingw-w64-x86-64/ruby
 * vagrant
-  * vagrant/openindiana
-  * vagrant/openbsd6
 
 You can also get the list with `-l` or `-L` option.
