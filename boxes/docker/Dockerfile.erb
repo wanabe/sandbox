@@ -1,5 +1,9 @@
 <%- box.scan(/\/|$/) do -%>
-  <%- %><%= File.read("#{boxes_dir}/#$`/Dockerfile") -%>
+  <%-
+    path = "#{boxes_dir}/#$`/Dockerfile"
+    next unless File.exists? path
+  -%>
+  <%- -%><%= File.read(path) -%>
 <%- end -%>
 
 RUN if which apt-get; then apt-get update && apt-get install -y sudo; \

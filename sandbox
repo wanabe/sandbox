@@ -60,8 +60,8 @@ mkdir -p "$WORKDIR"
 if [ -f "$SANDBOXES_DIR/$BOX/Dockerfile" ]; then
   DOCKER_DIR="$WORKDIR/.docker/$USER"
   mkdir -p "$DOCKER_DIR"
-  erb box="$BOX" boxes_dir="$SANDBOXES_DIR" -T- "$SANDBOXES_DIR/Dockerfile.erb" > "$DOCKER_DIR/Dockerfile"
-  erb box="$BOX" workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker-compose.yml.erb" > "$DOCKER_DIR/docker-compose.yml"
+  erb box="$BOX" boxes_dir="$SANDBOXES_DIR" -T- "$SANDBOXES_DIR/docker/Dockerfile.erb" > "$DOCKER_DIR/Dockerfile"
+  erb box="$BOX" workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker/docker-compose.yml.erb" > "$DOCKER_DIR/docker-compose.yml"
   cd "$DOCKER_DIR"
   docker-compose build || fail
   docker-compose up -d 2>&1| grep "up-to-date$" && clean=0
@@ -74,7 +74,7 @@ fi
 if [ -f "$SANDBOXES_DIR/$BOX/vagrant_config.rb" ]; then
   export VAGRANT_CWD="$WORKDIR"
   [ "$(vagrant status|sed -ne '3s/^[^ ]* *\([^ ]*\).*/\1/p')" = running ] && clean=0
-  [ $clean = 1 ] && erb box="$BOX" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/Vagrantfile.erb" > "$VAGRANT_CWD/Vagrantfile"
+  [ $clean = 1 ] && erb box="$BOX" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/vagrant/Vagrantfile.erb" > "$VAGRANT_CWD/Vagrantfile"
   [ $clean = 1 ] && vagrant up
   vagrant ssh
   [ $clean = 1 ] && vagrant halt
