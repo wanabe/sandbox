@@ -1,5 +1,8 @@
 #!/bin/sh
 
+if [ -z "$SANDBOX_WORKDIR" ]; then
+  SANDBOX_WORKDIR=`pwd`
+fi
 if [ -z "$SANDBOX_ROOT" ]; then
   SANDBOX_ROOT=~/.sandbox
 fi
@@ -47,18 +50,33 @@ for OPT in "$@"; do
   esac
 done
 
-BOX="$1"
-SERVICE=`echo $BOX|tr \/ _`
+SERVICE=`echo "$1"|tr \/ -`
 export uid
 export USER
 export HOME
 [ -z "$uid" ] && uid=$(id -u)
 clean=1
-WORKDIR="$SANDBOX_VOLUMES_DIR/${BOX}"
 
-mkdir -p "$WORKDIR"
-if [ -f "$SANDBOXES_DIR/$BOX/Dockerfile" ]; then
-  . "$SANDBOXES_DIR/docker/sandbox"
-elif [ -f "$SANDBOXES_DIR/$BOX/vagrant_config.rb" ]; then
-  . "$SANDBOXES_DIR/vagrant/sandbox"
+if [ -z "$SANDBOX_HOME_DIR" ]; then
+  SANDBOX_HOME_DIR="$SANDBOX_WORKDIR/.sandbox/$SERVICE/home"
+fi
+mkdir -p "$SANDBOX_HOME_DIR/$USER"
+BOXES=""
+for BOX_PART in $(echo "$1"|sed -e "s/\// /g"); do
+  if [ -z "$BOXES" ]; then
+    if [ -d "$SANDBOXES_DIR/$BOX_PART" ]; then
+      BOXES="$SANDBOXES_DIR/$BOX_PART"
+      BOX="$SANDBOXES_DIR/$BOX_PART"
+    fi
+  else
+    for QUEUED_BOX in $BOXES; do
+      if [ -d "$QUEUED_BOX/$BOX_PART" ]; then
+        BOXES="$BOXES $QUEUED_BOX/$BOX_PART"
+      fi
+    done
+  fi
+done
+
+if [ -f "$BOX/sandbox" ]; then
+  . "$BOX/sandbox"
 fi

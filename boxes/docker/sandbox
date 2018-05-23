@@ -1,11 +1,12 @@
-DOCKER_DIR="$WORKDIR/.docker/$USER"
+DOCKER_DIR="$SANDBOX_WORKDIR/.sandbox/$SERVICE"
 mkdir -p "$DOCKER_DIR"
-erb box="$BOX" boxes_dir="$SANDBOXES_DIR" -T- "$SANDBOXES_DIR/docker/Dockerfile.erb" > "$DOCKER_DIR/Dockerfile"
-erb box="$BOX" workdir="$WORKDIR" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/docker/docker-compose.yml.erb" > "$DOCKER_DIR/docker-compose.yml"
+
+erb boxes="$BOXES" -T- "$BOX/Dockerfile.erb" > "$DOCKER_DIR/Dockerfile"
+erb boxes="$BOXES" service="$SERVICE" workdir="$SANDBOX_WORKDIR" volumes="$VOLUMES" user="$USER" uid="$uid" homedir="$SANDBOX_HOME_DIR" -T- "$BOX/docker-compose.yml.erb" > "$DOCKER_DIR/docker-compose.yml"
+
 cd "$DOCKER_DIR"
 docker-compose build || fail
 docker-compose up -d 2>&1| grep "up-to-date$" && clean=0
 docker-compose exec "$SERVICE" bash -l
 [ $clean = 1 ] || exit
 docker-compose down
-exit

@@ -1,6 +1,7 @@
-export VAGRANT_CWD="$WORKDIR"
+export VAGRANT_CWD="$SANDBOX_WORKDIR/.sandbox/$SERVICE"
+mkdir -p "$VAGRANT_CWD"
 [ "$(vagrant status|sed -ne '3s/^[^ ]* *\([^ ]*\).*/\1/p')" = running ] && clean=0
-[ $clean = 1 ] && erb box="$BOX" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/vagrant/Vagrantfile.erb" > "$VAGRANT_CWD/Vagrantfile"
+[ $clean = 1 ] && erb boxes="$BOXES" service="$SERVICE" volumes="$VOLUMES" -T- "$SANDBOXES_DIR/vagrant/Vagrantfile.erb" > "$VAGRANT_CWD/Vagrantfile"
 [ $clean = 1 ] && vagrant up
 vagrant ssh
 [ $clean = 1 ] && vagrant halt

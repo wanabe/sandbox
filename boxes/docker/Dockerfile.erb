@@ -1,7 +1,7 @@
-<%- box.scan(/\/|$/) do -%>
+<%- boxes.split(" ").each do |box| -%>
   <%-
-    path = "#{boxes_dir}/#$`/Dockerfile"
-    next unless File.exists? path
+    path = "#{box}/Dockerfile"
+    next unless File.exist? path
   -%>
   <%- -%><%= File.read(path) -%>
 <%- end -%>

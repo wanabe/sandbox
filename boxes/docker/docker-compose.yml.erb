@@ -1,18 +1,19 @@
 version: '3'
 services:
-  <%= box.tr("/", "_") %>:
-    image: sandbox-<%= box %>
-    user: <%= ENV["USER"] %>
+  <%= service %>:
+    image: <%= service %>-<%= user %>
+    user: <%= user %>
     build:
       context: .
       args:
-        uid: <%= ENV["uid"] %>
-        user: <%= ENV["USER"] %>
+        uid: <%= uid %>
+        user: <%= user %>
     tty: true
     stdin_open: true
-    working_dir: /work
+    working_dir: /sandbox
     volumes:
-    - <%= workdir %>:/work
+    - <%= workdir %>:/sandbox
+    - <%= homedir %>:/home
     <%- volumes.split(" ").each do |volume| -%>
     - "<%= volume %>"
     <%- end -%>
