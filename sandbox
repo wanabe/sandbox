@@ -28,26 +28,31 @@ done
 
 for OPT in "$@"; do
   case "$OPT" in
-    --install )
+    --install ) # install `sandbox` command
       [ -d ~/.local/bin ] || mkdir ~/.local/bin
       [ -L ~/.local/bin/sandbox ] || ln -s `pwd`/sandbox ~/.local/bin/sandbox
       exit
       ;;
-    -l )
+    -h ) # show this help
+      echo "Usage: $BASE [options] sandbox-name"
+      cat "$BASE"|sed -ne '/^for OPT in/,/^done/s/^ *\(-[^ )]*\) ) # \(.*\)/\1         \2/p'|sed -e 's/^\(.\{9\}\) */  \1 /g'
+      exit
+      ;;
+    -l ) # list sandboxes
       cd "$SANDBOXES_DIR"
       find * -type d
       exit
       ;;
-    -L )
+    -L ) # pretty-print sandboxes
       cd "$SANDBOXES_DIR"
       find * -type d|ruby -pe '$_ = "#{"  " * $_.count("/")}* #$_"'
       exit
       ;;
-    -H )
+    -H ) # set /home/ directory of sandbox
       SANDBOX_HOME_DIR="$1"
       shift 2
       ;;
-    -v )
+    -v ) # specify volume(s)
       [ -n "$VOLUMES" ] && VOLUMES="$VOLUMES "
       VOLUMES="${VOLUMES}$2"
       shift 2
