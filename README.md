@@ -37,19 +37,20 @@ Above means it runs docker/ppc64le/ruby with shared directory "~/work/prog/ruby/
 ## current list of sandboxes
 
 * docker
-  * docker/ppc64le
-    * docker/ppc64le/ruby
   * docker/aarch64
     * docker/aarch64/ruby
+  * docker/ppc64le
+    * docker/ppc64le/ruby
   * docker/x86_64
-    * docker/x86_64/ubuntu
-      * docker/x86_64/ubuntu/ruby
     * docker/x86_64/alpine
       * docker/x86_64/alpine/ruby
     * docker/x86_64/mingw-w64-x86-64
       * docker/x86_64/mingw-w64-x86-64/ruby
+    * docker/x86_64/ubuntu
+      * docker/x86_64/ubuntu/ruby
 * vagrant
   * vagrant/x86_64
+    * vagrant/x86_64/amazonlinux-2
     * vagrant/x86_64/freebsd
 
 You can also get the list with `-l` or `-L` option.
