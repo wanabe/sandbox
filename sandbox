@@ -92,7 +92,8 @@ for BOX_PART in $(echo "$1"|sed -e "s/\// /g"); do
     done
   fi
 done
+shift 1
 
 if [ -f "$BOX/sandbox" ]; then
-  . "$BOX/sandbox"
+  . "$BOX/sandbox" "$@"
 fi

@@ -5,6 +5,11 @@ erb boxes="$BOXES" -T- "$BOX/Dockerfile.erb" > "$DOCKER_DIR/Dockerfile"
 erb boxes="$BOXES" service="$SERVICE" workdir="$SANDBOX_WORKDIR" volumes="$VOLUMES" user="$USER" uid="$uid" homedir="$SANDBOX_HOME_DIR" -T- "$BOX/docker-compose.yml.erb" > "$DOCKER_DIR/docker-compose.yml"
 
 cd "$DOCKER_DIR"
+if [ -n "$1" ]; then
+  eval "$*"
+  exit
+fi
+
 docker-compose build || fail
 docker-compose up -d 2>&1| grep "up-to-date$" && clean=0
 docker-compose exec "$SERVICE" bash -l
