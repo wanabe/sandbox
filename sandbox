@@ -40,12 +40,12 @@ for OPT in "$@"; do
       ;;
     -l ) # list sandboxes
       cd "$SANDBOXES_DIR"
-      find * -type d
+      find * -type d|sort
       exit
       ;;
     -L ) # pretty-print sandboxes
       cd "$SANDBOXES_DIR"
-      find * -type d|ruby -pe '$_ = "#{"  " * $_.count("/")}* #$_"'
+      find * -type d|sort|ruby -pe '$_ = "#{"  " * $_.count("/")}* #$_"'
       exit
       ;;
     -H ) # set /home/ directory of sandbox
